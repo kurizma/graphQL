@@ -67,20 +67,23 @@ function storeToken(token) {
     localStorage.setItem('jwtToken', token)
 }
 
-// document.getElementById('loginForm').addEventListener('submit', handleSubmit);
+// ....Fetching Data from graphQL endpoint.....
 
+// Initialize event listener and check login status
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('loginForm').addEventListener('submit', handleSubmit);
+    checkAndFetchUserData(); // Call this function to check if user is logged in
+});
 
-// Fetching Data - using GraphQL endpoint
-
-
-// Function to fetch user data from GraphQL API
-async function fetchUserData() {
+// Function to check if user is logged in and fetch user data
+async function checkAndFetchUserData() {
     try {
         const token = localStorage.getItem('jwtToken');
         if (!token) {
-            throw new Error('No JWT token found');
+            return; // No token, user is not logged in
         }
 
+        // Fetch user data using the stored token
         const response = await fetch('https://01.gritlab.ax/api/graphql-engine/v1/graphql', {
             method: 'POST',
             headers: {
@@ -102,17 +105,18 @@ async function fetchUserData() {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch data');
+            // Token might be invalid, remove it and prompt user to log in
+            localStorage.removeItem('jwtToken');
+            return;
         }
 
         const data = await response.json();
-        console.log('Response Data:',data)
+        const userData = data.data.user;
 
-        return data.data.user;
-        
+        // Display user data
+        displayUserData(userData);
     } catch (error) {
         console.error('Error fetching user data:', error);
-        return null;
     }
 }
 
@@ -122,7 +126,7 @@ function displayUserData(userData) {
     console.log("UserData", userData);
 
     const userDataDiv = document.getElementById('userData');
-    const user = userData[0];
+    const user = userData[0]; 
 
     userDataDiv.innerHTML = `
         <p>First Name: ${user.firstName}</p>
@@ -132,11 +136,13 @@ function displayUserData(userData) {
     `;
 }
 
+
 async function fetchAndDisplayUserData() {
     const userData = await fetchUserData();
     displayUserData(userData);
 }
 
+// .............. 
 
 // Initialize event listener
 function init() {
