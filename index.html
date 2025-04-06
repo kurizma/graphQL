@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .invalid {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Login Form</h1>
+    <form id="loginForm">
+        <label for="usernameOrEmail">Username or Email:</label><br>
+        <input type="text" id="usernameOrEmail" name="usernameOrEmail" required><br><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+        <input type="submit" value="Submit">
+    </form>
+    <div id="error-message"></div>
+
+    <h1>GraphQL User Data</h1>
+    <div id="userData"></div>
+    
+    <script src="main.js"></script>
+</body>
+</html>
