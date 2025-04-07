@@ -99,6 +99,10 @@ async function checkAndFetchUserData() {
                             login
                             id
                         }
+                        transaction (where: { type: { _eq: "xp" } }) {
+                            type
+                            amount
+                        }
                     }
                 `,
             }),
@@ -111,17 +115,23 @@ async function checkAndFetchUserData() {
         }
 
         const data = await response.json();
+        console.log(data)
+ 
+
         const userData = data.data.user;
+        const transactionData = data.data.transaction;
+
+        const totalXP = transactionData.reduce((acc, transaction) => acc + transaction.amount, 0);
 
         // Display user data
-        displayUserData(userData);
+        displayUserData(userData, totalXP);
     } catch (error) {
         console.error('Error fetching user data:', error);
     }
 }
 
 // Function to display user data
-function displayUserData(userData) {
+function displayUserData(userData, totalXP) {
     if (!userData || !userData.length) return; // Check if userData is an empty array
     console.log("UserData", userData);
 
@@ -134,12 +144,18 @@ function displayUserData(userData) {
         <p>Username: ${user.login}</p>
         <p>ID: ${user.id}</p>
     `;
+
+    const dataBoxDiv = document.getElementById('dataBox')
+    
+    dataBoxDiv.innerHTML = `
+        <p>Total XP: ${totalXP}</p>
+    `;
+
 }
 
 
 async function fetchAndDisplayUserData() {
-    const userData = await fetchUserData();
-    displayUserData(userData);
+    await checkAndFetchUserData();
 }
 
 // .............. 
@@ -156,13 +172,5 @@ init();
 // sendLoginRequest(encodedCredentials, errorMessage).then(() => {
 //     fetchUserData().then(userData => displayUserData(userData));
 // });
-
-
-
-
-
-
-
-
 
 
