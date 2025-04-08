@@ -21,11 +21,9 @@ function handleSubmit(event) {
     sendLoginRequest(encodedCredentials, errorMessage);
 }
 
-
-
 async function sendLoginRequest(encodedCredentials, errorMessage) {
     try {
-        // Assuing a REST signin endpoint
+        // Assuming a REST signin endpoint
         const response = await fetch('https://01.gritlab.ax/api/auth/signin', {
             method: 'POST',
             headers: {
@@ -34,21 +32,16 @@ async function sendLoginRequest(encodedCredentials, errorMessage) {
             },
         });
 
-
-
         if (!response.ok) {
             throw new Error('Failed to fetch data');
         }
         const token = await response.json();
-        // console.log('Received token:', token);
-
         if (!token) {
             throw new Error('No token received');
         }
 
         // Store JWT Token
         storeToken(token);
-
 
         errorMessage.textContent = '';
 
@@ -58,25 +51,98 @@ async function sendLoginRequest(encodedCredentials, errorMessage) {
 
     } catch (error) {
         console.error('Error logging in:', error);
-        errorMessage.textContent = 'Login failed. Please check your credntials.';
+        errorMessage.textContent = 'Login failed. Please check your credentials.';
     }
 }
 
 function storeToken(token) {
-    // Using local storage to store token, but consider using secure cookes for better security
+    // Using local storage to store token, but consider using secure cookies for better security
     localStorage.setItem('jwtToken', token)
 }
 
-// ....Fetching Data from graphQL endpoint.....
+// Function to display user data
+function displayUserData(userData) {
+    if (!userData) return; // Check if userData is empty
 
-// Initialize event listener and check login status
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('loginForm').addEventListener('submit', handleSubmit);
-    checkAndFetchUserData(); // Call this function to check if user is logged in
-});
+    const userDataDiv = document.getElementById('userData');
+    userDataDiv.innerHTML = `
+        <p>First Name: ${userData.firstName}</p>
+        <p>Last Name: ${userData.lastName}</p>
+        <p>Username: ${userData.login}</p>
+        <p>ID: ${userData.id}</p>
+    `;
+}
+
+// Function to display transaction data
+function displayTransactionData(transactionData) {
+    const allDataDiv = document.getElementById('allTransactionData');
+    let allDataHtml = '';
+
+    if (Array.isArray(transactionData)) {
+        allDataHtml += '<h3>All Transaction Data:</h3>';
+        transactionData.forEach((transaction) => {
+            if (!transaction.path.includes('/piscine-go/')) {
+                allDataHtml += `
+                    <p>Type: ${transaction.type}</p>
+                    <p>Amount: ${transaction.amount}</p>
+                    <p>Path: ${transaction.path}</p>
+                `;
+            }
+        });
+    } else {
+        allDataHtml += '<h3>All Transaction Data:</h3>';
+        allDataHtml += `
+            <p>Type: ${transactionData.type}</p>
+            <p>Amount: ${transactionData.amount}</p>
+            <p>Path: ${transactionData.path}</p>
+        `;
+    }
+
+    allDataDiv.innerHTML = allDataHtml;
+}
+
+// Function to calculate transaction sums
+function calculateTransactionSums(transactionData) {
+    const sums = {};
+
+    if (Array.isArray(transactionData)) {
+        transactionData.forEach((transaction) => {
+            const transactionType = transaction.type;
+            const amount = transaction.amount;
+            if (transactionType in sums) {
+                sums[transactionType] += amount;
+            } else {
+                sums[transactionType] = amount;
+            }
+        });
+    } else {
+        const transactionType = transactionData.type;
+        const amount = transactionData.amount;
+        if (transactionType in sums) {
+            sums[transactionType] += amount;
+        } else {
+            sums[transactionType] = amount;
+        }
+    }
+
+    return sums;
+}
+
+// Function to display transaction sums
+function displayTransactionSums(transactionData) {
+    const sums = calculateTransactionSums(transactionData);
+    const dataBoxDiv = document.getElementById('dataBox');
+    let html = '';
+    for (const type in sums) {
+        html += `<p>Total of ${type}: ${sums[type]}</p>`;
+    }
+
+    dataBoxDiv.innerHTML = html;
+}
 
 // Function to check if user is logged in and fetch user data
 async function checkAndFetchUserData() {
+    let userData = {};
     try {
         const token = localStorage.getItem('jwtToken');
         if (!token) {
@@ -99,9 +165,10 @@ async function checkAndFetchUserData() {
                             login
                             id
                         }
-                        transaction (where: { type: { _eq: "xp" } }) {
+                        transaction {
                             type
                             amount
+                            path
                         }
                     }
                 `,
@@ -116,61 +183,43 @@ async function checkAndFetchUserData() {
 
         const data = await response.json();
         console.log(data)
- 
 
-        const userData = data.data.user;
+        userData = data.data.user;
         const transactionData = data.data.transaction;
 
-        const totalXP = transactionData.reduce((acc, transaction) => acc + transaction.amount, 0);
+        if (Array.isArray(userData)) {
+            userData = userData[0]; // Access the first element if it's an array
+        }
 
-        // Display user data
-        displayUserData(userData, totalXP);
+        displayUserData(userData);
+
+        if (Array.isArray(transactionData)) {
+            displayTransactionData(transactionData); // Display raw transaction data
+            displayTransactionSums(transactionData); // Display transaction sums
+        } else {
+            displayTransactionData(transactionData); // Handle single transaction data
+            displayTransactionSums(transactionData); // Display sums for single transaction
+        }
+
     } catch (error) {
         console.error('Error fetching user data:', error);
     }
 }
 
-// Function to display user data
-function displayUserData(userData, totalXP) {
-    if (!userData || !userData.length) return; // Check if userData is an empty array
-    console.log("UserData", userData);
-
-    const userDataDiv = document.getElementById('userData');
-    const user = userData[0]; 
-
-    userDataDiv.innerHTML = `
-        <p>First Name: ${user.firstName}</p>
-        <p>Last Name: ${user.lastName}</p>
-        <p>Username: ${user.login}</p>
-        <p>ID: ${user.id}</p>
-    `;
-
-    const dataBoxDiv = document.getElementById('dataBox')
-    
-    dataBoxDiv.innerHTML = `
-        <p>Total XP: ${totalXP}</p>
-    `;
-
-}
-
-
+// Function to fetch and display user data after logging in
 async function fetchAndDisplayUserData() {
     await checkAndFetchUserData();
 }
 
-// .............. 
+// Initialize event listener and check login status
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('loginForm').addEventListener('submit', handleSubmit);
+    checkAndFetchUserData(); // Call this function to check if user is logged in
+});
 
 // Initialize event listener
 function init() {
     document.getElementById('loginForm').addEventListener('submit', handleSubmit);
 }
 
-// Call init function
 init();
-
-// // Call fetchUserData after logging in
-// sendLoginRequest(encodedCredentials, errorMessage).then(() => {
-//     fetchUserData().then(userData => displayUserData(userData));
-// });
-
-
