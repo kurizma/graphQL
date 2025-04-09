@@ -34,3 +34,17 @@ gQL query
   }
 
   look at path
+
+
+  	progress(
+    where: { eventId: { _eq: 104}}
+  ) {
+    isDone
+		grade
+  }
+  
+  event {
+    progressesByEventid(where: { id: { _eq: 104 }}) {
+      userLogin
+    }
+  }

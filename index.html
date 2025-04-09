@@ -3,36 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Form</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .invalid {
-            color: red;
-        }
-    </style>
+    <title>GG</title>
+
+    <script src="/js/main.js" type="module" defer></script>
+
+    <link rel="stylesheet" type="text/css" href="./assets/main.css">
+    <link rel="stylesheet" type="text/css" href="./assets/login.css">
 </head>
+
 <body>
-    <h1>Login Form</h1>
-    <form id="loginForm">
-        <label for="usernameOrEmail">Username or Email:</label><br>
-        <input type="text" id="usernameOrEmail" name="usernameOrEmail" required><br><br>
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password" required><br><br>
-        <input type="submit" value="Submit">
-    </form>
-    <div id="error-message"></div>
+    <div id="loginView" style="display: block;"">
+        <div id="loginBox">
+             <form id="loginForm">
+                <h2>Welcome</h2>
+                <label for="usernameOrEmail">Username or Email:</label><br>
+                <input type="text" id="usernameOrEmail" name="usernameOrEmail" required><br><br>
+                <label for="password">Password:</label><br>
+                <input type="password" id="password" name="password" required><br><br>
+                <input type="submit" value="Submit">
+            </form>
 
-    <h1>GraphQL User Data</h1>
-    <div id="userData"></div>
+            <div id="error-message"></div>
+        </div>
+    </div>
 
-    <h1>Data Box</h1>
-    <div id="dataBox"></div>
+    <div id="mainView" style="display: none;">
+        <h1>GraphQL User Data</h1>
+        <div id="userData"></div>
 
-    <h1>All Transaction Data</h1>
-    <div id="allTransactionData"></div>
-    
-    <script src="main.js"></script>
+        <h1>Data Box</h1>
+        <div id="dataBox"></div>
+
+        <h1>All Transaction Data</h1>
+        <div id="allTransactionData"></div>
+    </div>
+
 </body>
+
 </html>
