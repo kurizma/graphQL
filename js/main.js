@@ -100,7 +100,7 @@ async function fetchAndDisplayUserData() {
     }
 }
 
-// Switch between views (login and main)
+
 function switchToMainView() {
     document.getElementById('loginView').style.display = 'none';
     document.getElementById('mainView').style.display = 'block';

@@ -28,14 +28,29 @@
     </div>
 
     <div id="mainView" style="display: none;">
-        <h1>GraphQL User Data</h1>
-        <div id="userData"></div>
+        <header id="nav-bar">
+            <div id="nav-title">Title</div>
+            <div id="nav-message" class="align-right">
+                Welcome, <span id="username">Username</span> |
+            </div>
+            <button id="logout-button">Logout</button>
+        </header>
 
-        <h1>Data Box</h1>
-        <div id="dataBox"></div>
+        <div id="userInfo">
+            <h1>User Information</h1>
+            <div id="userData"></div>
+        </div>
 
-        <h1>All Transaction Data</h1>
-        <div id="allTransactionData"></div>
+        <div id="dataInfo">
+            <h1>Data Box</h1>
+            <div id="dataBox"></div>
+        </div>
+
+        <div id="txData">
+            <h1>All Transaction Data</h1>
+            <div id="allTransactionData"></div>
+        </div>
+
     </div>
 
 </body>
