@@ -1,4 +1,12 @@
-import { handleSubmit } from './auth.js';
+import { handleSubmit, handleLogout, switchToLoginView, switchToMainView } from './auth.js';
+import { fetchAllData } from './fetchData.js';
+
+
+
+function updateNavbar(user) {
+    const usernameSpan = document.getElementById('username');
+    usernameSpan.textContent = user.login;
+}
 
 // Display user data on the dashboard
 function displayUserData(userData) {
@@ -6,12 +14,30 @@ function displayUserData(userData) {
 
     const userDataDiv = document.getElementById('userData');
     userDataDiv.innerHTML = `
-        <p>First Name: ${userData.firstName}</p>
-        <p>Last Name: ${userData.lastName}</p>
-        <p>Username: ${userData.login}</p>
+        <p>Name: ${userData.firstName} ${userData.lastName}</p>
+        <p>LoginID: ${userData.login}</p>
         <p>ID: ${userData.id}</p>
     `;
 }
+
+function displayAuditInfo(user) {
+    const auditDiv = document.getElementById('auditData');
+
+    const roundedAuditRatio = parseFloat(user.auditRatio).toFixed(1);  
+
+    auditDiv.innerHTML = `
+        <p>Audit Ratio: ${roundedAuditRatio}</p>
+        <p>Audit Done XP: ${user.totalUp}</p>
+        <p>Audit Received XP: ${user.totalDown}</p>
+    `;
+}
+
+
+function displayTotalXP(xpSum) {
+    const xpDiv = document.getElementById('totalXpData');
+    xpDiv.innerHTML = `<h3>Total XP: ${xpSum}</h3>`;
+}
+
 
 // Display transaction data on the dashboard
 function displayTransactionData(transactionData) {
@@ -31,13 +57,11 @@ function displayTransactionData(transactionData) {
     allDataDiv.innerHTML = allDataHtml;
 }
 
-// Calculate transaction sums by type
-function calculateTransactionSums(transactionData) {
-    return transactionData.reduce((sums, transaction) => {
-        sums[transaction.type] = (sums[transaction.type] || 0) + transaction.amount;
-        return sums;
-    }, {});
+
+function sanitizePath(path) {
+    return path.replace(/.*\/projects\//, 'Project: ');
 }
+
 
 // Display transaction sums on the dashboard
 function displayTransactionSums(transactionData) {
@@ -52,77 +76,59 @@ function displayTransactionSums(transactionData) {
     dataBoxDiv.innerHTML = html;
 }
 
+
+
+
 // Fetch user and transaction data from the API
 async function fetchAndDisplayUserData() {
     try {
-        const token = localStorage.getItem('jwtToken');
-        if (!token) throw new Error('No token available');
+        // Fetch all data using the new modular function
+        const { user, xpSum, xpTransaction } = await fetchAllData();
 
-        const response = await fetch('https://01.gritlab.ax/api/graphql-engine/v1/graphql', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                query: `
-                    query {
-                        user {
-                            firstName
-                            lastName
-                            login
-                            id
-                        }
-                        transaction(order_by: { createdAt: desc }) {
-                            type
-                            amount
-                            path
-                        }
-                    }
-                `,
-            }),
-        });
+        updateNavbar(user);
 
-        if (!response.ok) throw new Error('Failed to fetch user data');
+        // Display user information
+        displayUserData(user);
 
-        const { data } = await response.json();
-        
-        displayUserData(data.user[0]); // Display user info (first user)
-        
-        const filteredTransactions = data.transaction.filter(t => !t.path.includes('/piscine-go/'));
-        
-        displayTransactionData(filteredTransactions); // Display transactions
-        displayTransactionSums(filteredTransactions); // Display transaction totals
+        // Display audit ratio, total upvotes, and total downvotes
+        displayAuditInfo(user);
+
+        // Display total XP sum
+        displayTotalXP(xpSum);
+
+        // Display detailed transaction data
+        displayTransactionData(xpTransaction);
+
+        // Display transaction sums
+        displayTransactionSums(xpTransaction);
+
+        // Filter and display detailed transaction data
+        const sanitizedTransactions = xpTransaction.map(transaction => ({
+            ...transaction,
+            path: sanitizePath(transaction.path), // Sanitize paths here
+        }));
+        displayTransactionData(sanitizedTransactions);
 
     } catch (error) {
-        console.error('Error fetching user data:', error);
-        switchToLoginView(); // Redirect to login if there's an issue with the token
+        console.error('Error fetching or displaying data:', error);
+        switchToLoginView(); // Redirect to login view on error
     }
 }
 
 
-function switchToMainView() {
-    document.getElementById('loginView').style.display = 'none';
-    document.getElementById('mainView').style.display = 'block';
-}
+// Start
 
-function switchToLoginView() {
-    document.getElementById('loginView').style.display = 'block';
-    document.getElementById('mainView').style.display = 'none';
-}
-
-// Check login status on page load and initialize event listeners
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('jwtToken');
     
     if (token) {
         switchToMainView();
-        fetchAndDisplayUserData(); // Load data if token exists
+        fetchAndDisplayUserData(); 
     } else {
-        switchToLoginView(); // Ensure login view is shown if no token
+        switchToLoginView(); 
     }
 
-    // Attach form submission handler
+
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         await handleSubmit(e);
         if (localStorage.getItem('jwtToken')) {
@@ -130,7 +136,23 @@ document.addEventListener('DOMContentLoaded', () => {
             await fetchAndDisplayUserData(); // Load data after successful login
         }
     });
+
+    document.getElementById('logout-button').addEventListener('click', () => {
+        handleLogout();
+    });
 });
 
 
+
+
+
+
+
+// Calculate transaction sums by type
+function calculateTransactionSums(transactionData) {
+    return transactionData.reduce((sums, transaction) => {
+        sums[transaction.type] = (sums[transaction.type] || 0) + transaction.amount;
+        return sums;
+    }, {});
+}
 

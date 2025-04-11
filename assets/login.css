@@ -1,14 +1,14 @@
 /* Login View */
 #loginView {
-    position: relative;
+    position: fixed;
     width: 100%;
-    height: 100%;
-    z-index: 10; /* Bring login view to the front */
+    height: 100vh;
+    z-index: 10; 
 
-    background-color: var(--primary-bg-color); /* Use lavender as the background */
-    background-image: url('/assets/circle.svg'); /* Background image */
-    background-size: cover; /* Cover entire view */
-    background-position: center; /* Center the background image */
+    background-color: var(--primary-bg-color); 
+    background-image: url('/assets/circle.svg'); 
+    background-size: cover; 
+    background-position: center; 
 
     /* Center content using flexbox */
     display: flex;
@@ -29,7 +29,6 @@
 
 #loginForm {
     text-align: center; /* Center inline and inline-block elements */
-    position: relative; /* Allows for fine-tuning placement */
     top: -15px; /* Moves the form slightly above the vertical center */
 }
 

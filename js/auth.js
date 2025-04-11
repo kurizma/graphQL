@@ -22,7 +22,7 @@ export async function handleSubmit(event) {
 }
 
 // Send login request to the API
-export async function sendLoginRequest(encodedCredentials, errorMessage) {
+async function sendLoginRequest(encodedCredentials, errorMessage) {
     try {
         const response = await fetch(API_BASE_URL, {
             method: 'POST',
@@ -51,4 +51,21 @@ export async function sendLoginRequest(encodedCredentials, errorMessage) {
 // Store JWT token securely in localStorage
 function storeToken(token) {
     localStorage.setItem('jwtToken', token);
+}
+
+// Logout
+
+export function handleLogout() {
+    localStorage.removeItem('jwtToken'); 
+    switchToLoginView(); 
+}
+
+export function switchToMainView() {
+    document.getElementById('loginView').style.display = 'none';
+    document.getElementById('mainView').style.display = 'flex';
+}
+
+export function switchToLoginView() {
+    document.getElementById('loginView').style.display = 'flex';
+    document.getElementById('mainView').style.display = 'none';
 }

@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    <div id="loginView" style="display: block;"">
+    <div id="loginView">
         <div id="loginBox">
              <form id="loginForm">
                 <h2>Welcome</h2>
@@ -22,24 +22,40 @@
                 <input type="password" id="password" name="password" required><br><br>
                 <input type="submit" value="Submit">
             </form>
-
             <div id="error-message"></div>
         </div>
     </div>
 
-    <div id="mainView" style="display: none;">
-        <header id="nav-bar">
-            <div id="nav-title">Title</div>
-            <div id="nav-message" class="align-right">
-                Welcome, <span id="username">Username</span> |
-            </div>
-            <button id="logout-button">Logout</button>
-        </header>
 
-        <div id="userInfo">
-            <h1>User Information</h1>
-            <div id="userData"></div>
+    <header id="nav-bar">
+        <div id="nav-title">Title</div>
+        <div id="nav-message" class="align-right">
+            Welcome, <span id="username"></span> |
         </div>
+        <button id="logout-button">Logout</button>
+    </header>
+
+
+    <div id="mainView" style="display: none;">
+
+        <div id="infoData">
+            <div id="userInfo">
+                <h1>User Information</h1>
+                <div id="userData"></div>
+            </div>
+
+            <div id="auditInfo">
+                <h1>Audit Ratio</h1>
+                <div id="auditData"></div>
+            </div>
+        </div>
+
+
+        <div id="totalXpInfo">
+            <div id="totalXpData"></div>
+        </div>
+
+        <div id="allTransactionData"></div>
 
         <div id="dataInfo">
             <h1>Data Box</h1>
