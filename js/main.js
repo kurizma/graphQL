@@ -35,7 +35,10 @@ function displayAuditInfo(user) {
 
 function displayTotalXP(xpSum) {
     const xpDiv = document.getElementById('totalXpData');
-    xpDiv.innerHTML = `<h3>Total XP: ${xpSum}</h3>`;
+    xpDiv.innerHTML = `
+    <h3>Total Amount of XP Earned:</h3>
+    <h3>${xpSum}</h3>
+    `;
 }
 
 

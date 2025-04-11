@@ -33,8 +33,10 @@ html, body {
     flex-direction: row; /* Arrange children vertically by default */
     justify-content: space-between; /* Add space between the divs */
     align-items: flex-start; /* Align items at the top */
-    gap: 20px; /* Add spacing between rows */
+    gap: 30px; /* Add spacing between rows */
     padding: 20px; /* Add padding around the container */
+    box-sizing: border-box; /* Ensure padding doesn’t affect width */
+    text-align: center;
 }
 
 #userInfo, #auditInfo {
@@ -44,23 +46,38 @@ html, body {
     border-radius: 8px;
     padding: 10px; /* Optional: Add padding inside each div */
     box-sizing: border-box; /* Ensure padding doesn't affect width */
-    margin-top: 30px;
-    margin-left: 30px;
+    margin-top: 0; /* Remove margins that disrupt layout */
 }
 
-#totalXpInfo {
-    margin-top: 20px; /* Add spacing above graph section */
-    border: 3px solid #ccc; /* Optional for clarity */
-    border-radius: 8px;
-    padding: 20px;
-}
 
 #userData, #auditData, #totalXpInfo {
     margin-top: 10px; /* Add spacing between title and content */
 }
 
+#totalXpInfo {
+    margin-top: 20px; /* Add spacing above graph section */
+    display: flex; /* Enable Flexbox */
+    justify-content: center; /* Center child horizontally */
+    align-items: flex-start; /* Keep content aligned at the top (default) */
+    padding: 20px; /* Add padding if needed */
+}
+
+#totalXpData {
+    text-align: center;
+    border: 3px solid #ccc; /* Optional for clarity */
+    border-radius: 8px;
+    padding: 20px;
+    display: inline-block;
+    margin-top: 20px; /* Add spacing above graph section */
+}
+
+
+
 
 /* --------------  */
+
+
+
 
 
 /* Navbar Styling */
