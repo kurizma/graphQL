@@ -4,13 +4,19 @@ export async function fetchAllData() {
         if (!token) throw new Error('No token available');
 
         const userData = await executeQuery(USER_QUERY, token);
+        console.log(userData);
         const xpSumData = await executeQuery(XP_SUM_QUERY, token);
+        console.log(xpSumData);
         const xpTransactionData = await executeQuery(XP_TRANSACTIONS_QUERY, token);
+        console.log(xpTransactionData);
+        const typeTransactionData = await executeQuery(TYPE_TRANSACTION_QUERY, token);
+        console.log(typeTransactionData);
 
         return {
             user: userData.user[0],
             xpSum: xpSumData.transaction_aggregate.aggregate.sum.amount,
             xpTransaction: xpTransactionData.transaction,
+            typeTransaction: typeTransactionData.transaction
         };
     } catch (error) {
         console.error('Error fetching data:', error)
@@ -76,9 +82,20 @@ const XP_TRANSACTIONS_QUERY = `
     ) {
         path
         type
+        createdAt
         amount
     }
 }`;
+
+const TYPE_TRANSACTION_QUERY = `
+    query { 
+        transaction(where: {eventId: {_eq: 104}}) {
+        type
+        }
+    }
+`
+
+
 
 
 // export const AUDIT_QUERY = `

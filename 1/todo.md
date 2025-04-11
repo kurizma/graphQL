@@ -193,3 +193,69 @@ gQL query
     eventId
   }
   
+
+
+  #     {
+#       field(arg: "value") {
+#         subField
+#       }
+#     }
+#
+# Keyboard shortcuts:
+#
+#   Prettify query:  Shift-Ctrl-P (or press the prettify button)
+#
+#  Merge fragments:  Shift-Ctrl-M (or press the merge button)
+#
+#        Run Query:  Ctrl-Enter (or press the play button)
+#
+#    Auto Complete:  Ctrl-Space (or just start typing)
+#
+
+  {
+    user {
+      id
+      firstName
+      lastName
+      login
+      campus
+      auditRatio
+      totalUp
+      totalDown
+      xps {
+        amount
+        path
+      }
+        attrs
+    }
+    
+    transaction_aggregate(
+      where: {_and: [{type: {_eq: "xp"}}, {eventId: {_eq: 104}}]}
+    ) {
+      aggregate {
+        sum {
+          amount
+        }
+      }
+    }
+    
+  	audit(where: {_and: [{auditorId: {_eq: 2574}}, {auditedAt: {_is_null: false}}]}) {
+    	id
+  	}
+    
+    # relevant data exp
+  	transaction(
+      order_by: [{ createdAt: desc }]
+      where: { type: { _like: "xp" }, eventId: {_eq: 104}}
+    ) {
+    	path
+    	type
+    	amount
+  }
+  
+}
+
+
+
+
+
