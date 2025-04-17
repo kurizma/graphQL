@@ -53,10 +53,6 @@ const USER_QUERY = `
             auditRatio
             totalUp
             totalDown
-            xps {
-                amount
-                path
-            }
             attrs
         }
     }`;
