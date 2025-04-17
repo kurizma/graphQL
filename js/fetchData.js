@@ -96,11 +96,3 @@ const TYPE_TRANSACTION_QUERY = `
 `
 
 
-
-
-// export const AUDIT_QUERY = `
-//     query {
-//         audit(where: {_and: [{auditorId: {_eq: `, `}}, {auditedAt: {_is_null: false}}]}) {
-//         id
-//     }
-// }`;

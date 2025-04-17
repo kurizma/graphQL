@@ -1,30 +1,27 @@
-const API_BASE_URL = 'https://01.gritlab.ax/api/auth/signin';
+const API = 'https://01.gritlab.ax/api/auth/signin';
 
 export async function handleSubmit(event) {
     event.preventDefault();
 
-    const usernameOrEmailInput = document.getElementById('usernameOrEmail');
+    const loginInput = document.getElementById('login');
     const passwordInput = document.getElementById('password');
     const errorMessage = document.getElementById('error-message');
 
-    // Basic validation
-    if (!usernameOrEmailInput.value || !passwordInput.value) {
+    if (!loginInput.value || !passwordInput.value) {
         errorMessage.textContent = 'Please fill in both fields.';
         return;
     }
 
-    // Encode credentials
-    const credentials = `${usernameOrEmailInput.value}:${passwordInput.value}`;
+    const credentials = `${loginInput.value}:${passwordInput.value}`;
     const encodedCredentials = btoa(credentials);
 
-    // Send login request
     await sendLoginRequest(encodedCredentials, errorMessage);
 }
 
 // Send login request to the API
 async function sendLoginRequest(encodedCredentials, errorMessage) {
-    try {
-        const response = await fetch(API_BASE_URL, {
+    try { 
+        const response = await fetch(API, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -62,10 +59,12 @@ export function handleLogout() {
 
 export function switchToMainView() {
     document.getElementById('loginView').style.display = 'none';
+    document.getElementById('nav-bar').style.display = 'flex';
     document.getElementById('mainView').style.display = 'flex';
 }
 
 export function switchToLoginView() {
     document.getElementById('loginView').style.display = 'flex';
+    document.getElementById('nav-bar').style.display = 'none';
     document.getElementById('mainView').style.display = 'none';
 }
