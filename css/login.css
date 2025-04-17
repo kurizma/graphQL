@@ -6,7 +6,7 @@
     z-index: 10; 
 
     background-color: #C8B2EA; 
-    background-image: url('./graphQL/circle.svg');
+    background-image: url('/assets/circle.svg');
     background-size: 100% 100%; 
     background-position: center; 
     background-repeat: no-repeat;

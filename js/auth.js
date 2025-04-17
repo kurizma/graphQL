@@ -58,13 +58,17 @@ export function handleLogout() {
 }
 
 export function switchToMainView() {
+    console.log("Switching to MAIN view");
     document.getElementById('loginView').style.display = 'none';
     document.getElementById('nav-bar').style.display = 'flex';
     document.getElementById('mainView').style.display = 'flex';
+    document.getElementById('footer').hidden = false;
 }
 
 export function switchToLoginView() {
+    console.log("Switching to LOGIN view");
     document.getElementById('loginView').style.display = 'flex';
     document.getElementById('nav-bar').style.display = 'none';
     document.getElementById('mainView').style.display = 'none';
+    document.getElementById('footer').hidden = true;
 }
