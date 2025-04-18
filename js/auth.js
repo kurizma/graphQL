@@ -1,5 +1,9 @@
 const API = 'https://01.gritlab.ax/api/auth/signin';
 
+// What would happen if the user has to refresh their token
+// Need to implement a refreshToken logic.
+
+// switch to from localStorage to sessionStorage
 export async function handleSubmit(event) {
     event.preventDefault();
 
@@ -24,15 +28,33 @@ async function sendLoginRequest(encodedCredentials, errorMessage) {
         const response = await fetch(API, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                // 'Content-Type': 'application/json', // Removed cuz no body request
                 'Authorization': `Basic ${encodedCredentials}`,
+                'Accept': 'application/json' // added security
             },
         });
 
-        if (!response.ok) throw new Error('Failed to fetch data');
+        // if (!response.ok) throw new Error('Failed to fetch data');
+
+        // More specificed error
+        if (!response.ok) {
+            if (response.status === 401) {
+                errorMessage.textContent = 'Invalid credentials. Please try again.';
+            } else if (response.status >= 500) {
+                errorMessage.textContent = 'Server error. Please try again later.';
+            } else {
+                errorMessage.textContent = `Login failed (Error ${response.status}).`;
+            }
+            return false; // Stop further processing
+        }
 
         const token = await response.json();
-        if (!token) throw new Error('No token received');
+        // if (!token) throw new Error('No token received');
+        // detailed error message; more specified
+        if (!token) {
+            errorMessage.textContent = 'No token received from server.';
+            return false;
+        }
 
         storeToken(token); 
         errorMessage.textContent = ''; 
@@ -40,22 +62,24 @@ async function sendLoginRequest(encodedCredentials, errorMessage) {
 
     } catch (error) {
         console.error('Error logging in:', error);
-        errorMessage.textContent = 'Login failed. Please check your credentials.';
+        errorMessage.textContent = 'Network error. Please check your connection.';
         return false;
     }
 }
 
-// Store JWT token securely in localStorage
+// Store JWT token securely in sessionStorage
 function storeToken(token) {
-    localStorage.setItem('jwtToken', token);
+    sessionStorage.setItem('jwtToken', token);
 }
 
 // Logout
 
 export function handleLogout() {
-    localStorage.removeItem('jwtToken'); 
+    sessionStorage.removeItem('jwtToken'); 
+    sessionStorage.clear(); // clear token when logout
     switchToLoginView(); 
 }
+
 
 export function switchToMainView() {
     console.log("Switching to MAIN view");

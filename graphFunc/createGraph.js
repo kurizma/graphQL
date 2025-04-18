@@ -8,7 +8,7 @@ export function createLineGraph(xpTransactions, options = {}) {
         new Date(a.createdAt) - new Date(b.createdAt)
     );
 
-
+    // tx per day
     const grouped = groupTransactionsByDate(sorted);
     const dailyData = Object.entries(grouped).map(([date, txs]) => {
         const totalXP = txs.reduce((sum, tx) => sum + tx.amount, 0);
@@ -28,9 +28,10 @@ export function createLineGraph(xpTransactions, options = {}) {
         cumulativeXP.push(runningTotal);
     });
 
-    // Config with defaults
+    // Config with defaults; 
+    // can be overridden if "options" or a new object of config is passed
     const config = {
-        width: 900,
+        width: 1000,
         height: 400,
         padding: 50,
         lineColor: '#B79AE3',
@@ -48,12 +49,19 @@ export function createLineGraph(xpTransactions, options = {}) {
         gridLines.push(y);
     }
 
-    // Map data points to SVG coordinates (one per day)
-    const n = cumulativeXP.length;
-    const points = cumulativeXP.map((xp, i) => ({
-        x: config.padding + (i / (n - 1)) * (config.width - 2 * config.padding),
-        y: config.padding + (config.height - 2 * config.padding) - (xp / yMax) * (config.height - 2 * config.padding)
-    }));
+    // --- Date-proportional X-axis calculation ---
+    const firstDate = new Date(dailyData[0].createdAt);
+    const lastDate = new Date(dailyData[dailyData.length - 1].createdAt);
+    let totalDays = (lastDate - firstDate) / (1000 * 60 * 60 * 24); // 86,400,000 milliseconds in a day; 86,400 seconds, 1,440 minutes,
+    if (totalDays === 0) totalDays = 1; // Prevent division by zero for single point
+
+    const points = dailyData.map((day, i) => {
+        const daysFromStart = (new Date(day.createdAt) - firstDate) / (1000 * 60 * 60 * 24);
+        const x = config.padding + (daysFromStart / totalDays) * (config.width - 2.1 * config.padding);
+        const y = config.padding + (config.height - 2 * config.padding) - 
+                  (cumulativeXP[i] / yMax) * (config.height - 2 * config.padding);
+        return { x, y };
+    });
 
     // Build colored markers for each point using getMarkerColor
     let pointsSVG = '';
@@ -103,19 +111,19 @@ function groupTransactionsByDate(transactions) {
     transactions.forEach(tx => {
         const date = tx.createdAt.split('T')[0]; // "YYYY-MM-DD"
         if (!grouped[date]) {
+            //creating new arr for date
             grouped[date] = [];
         }
         grouped[date].push(tx);
     });
+    // returning the object of arrays of the "date"
     return grouped;
 }
 
 function getMarkerColor(path) {
-
     if (path.includes('checkpoint')) {
         return '#AEEBFF'; 
     }
-
     if (path.includes('piscine-')) {
         return '#A9D566'; 
     }
@@ -184,11 +192,11 @@ function createArcPaths(upCount, downCount, { center, radius, colors }) {
 function createCenterLabels(upCount, downCount, upPct, downPct, { center, colors }) {
     const labelY = center - 5;
     return `
-        <text x="${center}" y="${labelY - 5}" text-anchor="middle" 
+        <text x="${center}" y="${labelY - 2}" text-anchor="middle" 
             font-size="6" fill="${colors.text}">
             Up: ${upCount} (${upPct}%)
         </text>
-        <text x="${center}" y="${labelY + 5}" text-anchor="middle" 
+        <text x="${center}" y="${labelY + 14}" text-anchor="middle" 
             font-size="6" fill="${colors.text}">
             Down: ${downCount} (${downPct}%)
         </text>
@@ -238,7 +246,7 @@ export function createBarGraph(auditData, options = {}) {
         auditData.totalDown
     ];
 
-    const maxValue = Math.max(...values) * 1.1; // Add 10% headroom
+    const maxValue = Math.max(...values) * 1.1; // Add 11% headroom
 
     const barWidth = config.width / (values.length * 2);
     const gap = barWidth / 3;

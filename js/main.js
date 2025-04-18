@@ -3,7 +3,7 @@ import { renderData } from './displayData.js';
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('jwtToken');
+    const token = sessionStorage.getItem('jwtToken');
     
     if (token) {
         switchToMainView();
@@ -26,13 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (errorMessage) errorMessage.textContent = '';
 
             await handleSubmit(e);
-            console.log("Login Successful")
 
             if (submitBtn) submitBtn.disabled = false;
 
-            if (localStorage.getItem('jwtToken')) {
+            if (sessionStorage.getItem('jwtToken')) {
+                console.log("Login Successful")
                 switchToMainView();
                 renderData();
+
             }
         });
     }
